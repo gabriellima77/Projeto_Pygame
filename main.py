@@ -2,12 +2,14 @@ from settings import *
 import pygame
 from pygame.locals import *
 import sys
+from sprites import *
 
 pygame.init()
 clock = pygame.time.Clock()
 
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption(TITLE)
+display = pygame.Surface((SIZEUP[0], SIZEUP[1]))
 
 # Font
 font = pygame.font.Font("Anton-Regular.ttf", 30)
@@ -15,39 +17,17 @@ font = pygame.font.Font("Anton-Regular.ttf", 30)
 # Background
 background = pygame.image.load("img/background.jpg")
 
-# sprites
-path ='img/sprites/'
-sprite_idle = (pygame.image.load(path + "idle/adventurer-idle-00.png").convert(), pygame.image.load(path + "idle/adventurer-idle-01.png").convert(), pygame.image.load(path + "idle/adventurer-idle-02.png").convert())
-sprite_run_r = (pygame.image.load(path + "run/adventurer-run-00.png").convert(), pygame.image.load(path + "run/adventurer-run-01.png").convert(), pygame.image.load(path + "run/adventurer-run-02.png").convert(),
-                pygame.image.load(path + "run/adventurer-run-03.png").convert(), pygame.image.load(path + "run/adventurer-run-04.png").convert(), pygame.image.load(path + "run/adventurer-run-05.png").convert())
-sprite_run_l = []
-for s in sprite_run_r:
-    sprite_run_l.append(pygame.transform.flip(s, True, False))
-
-
-class Player:
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.width = sprite_idle[0].get_size()[0]
-        self.height = sprite_idle[0].get_size()[1]
-        self.vel = 2.5
-        self.left = False
-        self.right = False
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-
-block_rect = pygame.Rect(50, 0, 50, 50)
 
 def show_text(x, y, text, color, font):
     text_render = font.render(text, True, color)
-    screen.blit(text_render, (x, y))
+    display.blit(text_render, (x, y))
 
 
 def main_menu():
     while True:
         screen.fill(BLACK)
         game()
-        screen.blit(background, (0, 0))
+        display.blit(background, (0, 0))
         show_text(293, 33, 'Projeto Teste', BLACK, font)
         show_text(290, 30, 'Projeto Teste', WHITE, font)
         for event in pygame.event.get():
@@ -58,53 +38,92 @@ def main_menu():
         clock.tick(FPS)
 
 
-def animation(frame):
-    if not p.left and not p.right:
-        sprite = sprite_idle
-    else:
-        if p.left:
-            sprite = sprite_run_l
-        else:
-            sprite = sprite_run_r
-    sprite_index = frame // 7
-    if sprite_index < len(sprite):
-        screen.blit(sprite[sprite_index], (p.x, p.y))
-        return frame
-    else:
-        sprite_index = 0
-        screen.blit(sprite[sprite_index], (p.x, p.y))
-        return sprite_index
+all_sprites = pygame.sprite.Group()
+player = Player()
+platforms = pygame.sprite.Group()
+all_sprites.add(player)
 
 
-p = Player()
+def load_map():
+    file = open("map.txt", "r")
+    map = file.read()
+    i = j = 0
+    for cell in map:
+        if cell == '\n':
+            i += 1
+            j = -1
+        if cell == '1':
+            p = Platforms(j, i)
+            all_sprites.add(p)
+            platforms.add(p)
+        j += 1
+    file.close()
+
+
+def collision_test():
+    hit_list = []
+    tiles = []
+    for p in platforms:
+        tiles.append(p.rect)
+    for tile in tiles:
+        if player.rect.colliderect(tile):
+            hit_list.append(tile)
+    return hit_list
+
+
+def move():
+    collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
+    hit_list = collision_test()
+    print(player.rect.bottom)
+    for tile in hit_list:
+        if player.rect.right > tile.left  and player.rect.right  < tile.right and player.rect.bottom >= tile.bottom:
+                player.rect.right = tile.left - 24
+                player.velocity.x = 0
+                player.position.x = player.rect.right
+                collision_types['right'] = True
+        elif player.rect.left <= tile.right and player.rect.left > tile.left and player.rect.bottom >= tile.bottom:
+                player.rect.left = tile.right + 25
+                player.velocity.x = 0
+                player.position.x = player.rect.left
+                collision_types['left'] = True
+        elif player.rect.bottom > tile.top and player.rect.bottom < tile.bottom:
+                player.rect.bottom = tile.top + 1
+                player.velocity.y = 0
+                player.position.y = player.rect.bottom
+                player.jumping = False
+        elif player.velocity.y < 0:
+            player.rect.top = tile.bottom + 1
+            collision_types["top"] = True
+    return collision_types
+load_map()
 
 
 def game():
     running = True
-    frame = 0
     while running:
-        screen.fill(BLACK)
-        frame = animation(frame)
+        hits = pygame.sprite.spritecollide(player, platforms, False)
+        move()
+        '''if player.rect.right > SIZE[1] / 4:
+            player.position.x += abs(player.velocity.x)
+            for plat in platforms:
+                plat.rect.x += abs(player.velocity.x)
+        '''
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and p.x > p.vel:
-            p.left = True
-            p.x -= p.vel
-            p.rect.x = p.x
-        else:
-            p.left = False
-        if keys[pygame.K_RIGHT] and p.x < SIZE[0] - p.width:
-            p.right = True
-            p.x += p.vel
-            p.rect.x = p.x
-        else:
-            p.right = False
+            if event.type == KEYDOWN:
+                if (event.key == K_w or event.key == K_UP) and not player.jumping:
+                    player.jump()
+        all_sprites.update()
+        display.fill(BLACK)
+        all_sprites.draw(display)
+        for sprite in platforms:
+            if player.rect.colliderect(sprite.rect):
+                pygame.draw.rect(display, (0, 255, 0), sprite.rect)
+        screen.blit(pygame.transform.scale(display, SIZE), (0, 0))
         pygame.display.update()
         clock.tick(FPS)
-        frame += 1
 
 
 main_menu()
