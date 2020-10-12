@@ -12,12 +12,12 @@ class Player(pygame.sprite.Sprite):
         self.load_images()
         self.image = self.sprite_idle[0]
         self.rect = self.image.get_rect()
-        #self.rect.center = (SIZE[0] / 2, SIZE[1] / 2)
         self.velocity = vect(0, 0)
         self.acceleration = vect(0, 0)
         self.position = vect(self.rect.height, self.rect.width)
         self.walking = False
         self.jumping = False
+        self.collide = False
 
     def load_images(self):
         path ='img/sprites/'
@@ -45,20 +45,14 @@ class Player(pygame.sprite.Sprite):
             self.acceleration.x = -PLAYER_ACC
         if (keys[K_RIGHT] or keys[K_d]):
             self.acceleration.x = PLAYER_ACC
-
         # Movement
         self.acceleration.x += self.velocity.x * PLAYER_FRICTION
         self.velocity += self.acceleration
         if abs(self.velocity.x) < 0.5:
             self.velocity.x = 0
-        self.position += self.velocity + 0.5 * self.acceleration
-        self.rect.center = self.position
-
-        if self.position.x > SIZEUP[0]:
-            self.position.x = 0
-        if self.position.x < 0:
-            self.position.x = SIZEUP[0]
-        self.rect.midbottom = self.position
+        if not self.collide:
+            self.position += self.velocity + 0.5 * self.acceleration
+            self.rect.center = self.position
 
     def animate(self):
         now = pygame.time.get_ticks()
@@ -85,7 +79,7 @@ class Player(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
         if not self.jumping and not self.walking:
-            if now - self.last_update > 100:
+            if now - self.last_update > 150:
                 self.last_update = now
                 bottom = self.rect.bottom
                 self.current_frame = (self.current_frame + 1) % len(self.sprite_idle)
@@ -104,3 +98,18 @@ class Platforms(pygame.sprite.Sprite):
         self.y = row
         self.rect.x = col * TILE_SIZE
         self.rect.y = row * TILE_SIZE
+
+
+class Camera:
+    def __init__(self, width, height):
+        self.camera = pygame.Rect(0, 0, width, height)
+        self.width = width
+        self.height = height
+
+    def apply(self, entity):
+        return entity.rect.move(self.camera.topleft)
+
+    def update(self, target):
+        x = -target.rect.x + SIZEUP[0] / 2
+        y = -target.rect.y + SIZEUP[1] / 2
+        self.camera = pygame.Rect(x, y, self.width, self.height)

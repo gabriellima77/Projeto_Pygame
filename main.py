@@ -58,6 +58,7 @@ def load_map():
             platforms.add(p)
         j += 1
     file.close()
+    return i*32, j*32
 
 
 def collision_test():
@@ -71,43 +72,33 @@ def collision_test():
     return hit_list
 
 
-def move():
-    collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
+def collision():
     hit_list = collision_test()
-    print(player.rect.bottom)
+    highest = smallest = 0
     for tile in hit_list:
-        if player.rect.right > tile.left  and player.rect.right  < tile.right and player.rect.bottom >= tile.bottom:
-                player.rect.right = tile.left - 24
-                player.velocity.x = 0
-                player.position.x = player.rect.right
-                collision_types['right'] = True
-        elif player.rect.left <= tile.right and player.rect.left > tile.left and player.rect.bottom >= tile.bottom:
-                player.rect.left = tile.right + 25
-                player.velocity.x = 0
-                player.position.x = player.rect.left
-                collision_types['left'] = True
-        elif player.rect.bottom > tile.top and player.rect.bottom < tile.bottom:
-                player.rect.bottom = tile.top + 1
-                player.velocity.y = 0
-                player.position.y = player.rect.bottom
-                player.jumping = False
-        elif player.velocity.y < 0:
-            player.rect.top = tile.bottom + 1
-            collision_types["top"] = True
-    return collision_types
-load_map()
+        if player.rect.right - 8 > tile.left  and player.rect.right - 8 < tile.right and player.rect.bottom >= tile.bottom:
+            player.rect.right = tile.left - 16
+            player.velocity.x = 0
+            player.position.x = player.rect.right
+        elif player.rect.left + 8 <= tile.right and player.rect.left + 8 > tile.left and player.rect.bottom >= tile.bottom:
+            player.rect.left = tile.right + 18
+            player.velocity.x = 0
+            player.position.x = player.rect.left
+        elif player.velocity.y > 0:
+            player.velocity.y = 0
+            player.rect.bottom = tile.top - 18
+            player.position.y = player.rect.bottom
+            player.jumping = False
+
+
+map_size = load_map()
 
 
 def game():
     running = True
+    camera = Camera(map_size[0], map_size[1])
     while running:
-        hits = pygame.sprite.spritecollide(player, platforms, False)
-        move()
-        '''if player.rect.right > SIZE[1] / 4:
-            player.position.x += abs(player.velocity.x)
-            for plat in platforms:
-                plat.rect.x += abs(player.velocity.x)
-        '''
+        collision()
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -116,11 +107,10 @@ def game():
                 if (event.key == K_w or event.key == K_UP) and not player.jumping:
                     player.jump()
         all_sprites.update()
+        camera.update(player)
         display.fill(BLACK)
-        all_sprites.draw(display)
-        for sprite in platforms:
-            if player.rect.colliderect(sprite.rect):
-                pygame.draw.rect(display, (0, 255, 0), sprite.rect)
+        for sprite in all_sprites:
+            display.blit(sprite.image, camera.apply(sprite))
         screen.blit(pygame.transform.scale(display, SIZE), (0, 0))
         pygame.display.update()
         clock.tick(FPS)
