@@ -5,8 +5,9 @@ vect = pygame.math.Vector2
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, plat):
         pygame.sprite.Sprite.__init__(self)
+        self.plat = plat
         self.current_frame = 0
         self.last_update = 0
         self.load_images()
@@ -14,18 +15,26 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.velocity = vect(0, 0)
         self.acceleration = vect(0, 0)
-        self.position = vect(self.rect.height, self.rect.width)
+        self.position = vect(0, 0)
         self.walking = False
         self.jumping = False
-        self.collide = False
 
     def load_images(self):
-        path ='img/sprites/'
-        self.sprite_idle = (pygame.image.load(path + "idle/adventurer-idle-00.png").convert(), pygame.image.load(path + "idle/adventurer-idle-01.png").convert(), pygame.image.load(path + "idle/adventurer-idle-02.png").convert())
-        self.sprite_run_r = (pygame.image.load(path + "run/adventurer-run-00.png").convert(), pygame.image.load(path + "run/adventurer-run-01.png").convert(), pygame.image.load(path + "run/adventurer-run-02.png").convert(),
-                    pygame.image.load(path + "run/adventurer-run-03.png").convert(), pygame.image.load(path + "run/adventurer-run-04.png").convert(), pygame.image.load(path + "run/adventurer-run-05.png").convert())
-        self.sprite_jump_r = (pygame.image.load(path +"jump/adventurer-jump-00.png").convert(), pygame.image.load(path +"jump/adventurer-jump-01.png").convert(), pygame.image.load(path +"jump/adventurer-jump-02.png").convert(),
-                             pygame.image.load(path +"jump/adventurer-jump-03.png").convert(), pygame.image.load(path +"jump/adventurer-jump-04.png").convert())
+        path = 'img/sprites/'
+        self.sprite_idle = (pygame.image.load(path + "idle/adventurer-idle-00.png").convert(),
+                            pygame.image.load(path + "idle/adventurer-idle-01.png").convert(),
+                            pygame.image.load(path + "idle/adventurer-idle-02.png").convert())
+        self.sprite_run_r = (pygame.image.load(path + "run/adventurer-run-00.png").convert(),
+                             pygame.image.load(path + "run/adventurer-run-01.png").convert(),
+                             pygame.image.load(path + "run/adventurer-run-02.png").convert(),
+                             pygame.image.load(path + "run/adventurer-run-03.png").convert(),
+                             pygame.image.load(path + "run/adventurer-run-04.png").convert(),
+                             pygame.image.load(path + "run/adventurer-run-05.png").convert())
+        self.sprite_jump_r = (pygame.image.load(path + "jump/adventurer-jump-00.png").convert(),
+                              pygame.image.load(path + "jump/adventurer-jump-01.png").convert(),
+                              pygame.image.load(path + "jump/adventurer-jump-02.png").convert(),
+                              pygame.image.load(path + "jump/adventurer-jump-03.png").convert(),
+                              pygame.image.load(path + "jump/adventurer-jump-04.png").convert())
         self.sprite_run_l = []
         self.sprite_jump_l = []
         for s in self.sprite_run_r:
@@ -41,18 +50,18 @@ class Player(pygame.sprite.Sprite):
         self.animate()
         self.acceleration = vect(0, GRAV)
         keys = pygame.key.get_pressed()
-        if (keys[K_LEFT] or keys[K_a]):
+        if keys[K_LEFT] or keys[K_a]:
             self.acceleration.x = -PLAYER_ACC
-        if (keys[K_RIGHT] or keys[K_d]):
+        if keys[K_RIGHT] or keys[K_d]:
             self.acceleration.x = PLAYER_ACC
         # Movement
         self.acceleration.x += self.velocity.x * PLAYER_FRICTION
         self.velocity += self.acceleration
         if abs(self.velocity.x) < 0.5:
             self.velocity.x = 0
-        if not self.collide:
-            self.position += self.velocity + 0.5 * self.acceleration
-            self.rect.center = self.position
+        self.position += self.velocity + 0.5 * self.acceleration
+        self.rect.x = self.position.x
+        self.rect.y = self.position.y
 
     def animate(self):
         now = pygame.time.get_ticks()

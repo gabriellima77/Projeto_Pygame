@@ -18,8 +18,36 @@ font = pygame.font.Font("Anton-Regular.ttf", 30)
 background = pygame.image.load("img/background.jpg")
 
 
-def show_text(x, y, text, color, font):
-    text_render = font.render(text, True, color)
+def get_collision(player, tile):
+    hit_rect_list = []
+    for i in tile:
+        if player.rect.colliderect(i.rect):
+            hit_rect_list.append(i.rect)
+    return hit_rect_list
+
+
+def collision(player, tiles):
+    hits = get_collision(player, tiles)
+    for hit in hits:
+        if player.rect.left < hit.right and (player.rect.left > hit.left and hit.bottom < player.rect.bottom):
+            player.rect.left = hit.right
+            player.velocity.x = 0
+            player.position.x = player.rect.left
+        elif player.rect.right > hit.left and (player.rect.right < hit.right and hit.bottom < player.rect.bottom):
+            player.rect.right = hit.left
+            player.velocity.x = 0
+            player.position.x = player.rect.right - 49
+        elif player.rect.bottom > hit.top and player.rect.bottom < hit.bottom:
+            player.rect.bottom = hit.top + 1
+            player.position.y = player.rect.top
+            player.velocity.y = 0
+            player.jumping = False
+        elif player.rect.top + 5 < hit.bottom and player.velocity.y < 0:
+            player.velocity.y = 0
+
+
+def show_text(x, y, text, text_color, text_font):
+    text_render = text_font.render(text, True, text_color)
     display.blit(text_render, (x, y))
 
 
@@ -38,67 +66,33 @@ def main_menu():
         clock.tick(FPS)
 
 
-all_sprites = pygame.sprite.Group()
-player = Player()
-platforms = pygame.sprite.Group()
-all_sprites.add(player)
-
-
-def load_map():
+def load_map(sprites, platform):
     file = open("map.txt", "r")
-    map = file.read()
+    m = file.read()
     i = j = 0
-    for cell in map:
+    for cell in m:
         if cell == '\n':
             i += 1
             j = -1
         if cell == '1':
             p = Platforms(j, i)
-            all_sprites.add(p)
-            platforms.add(p)
+            sprites.add(p)
+            platform.add(p)
         j += 1
     file.close()
     return i*32, j*32
 
 
-def collision_test():
-    hit_list = []
-    tiles = []
-    for p in platforms:
-        tiles.append(p.rect)
-    for tile in tiles:
-        if player.rect.colliderect(tile):
-            hit_list.append(tile)
-    return hit_list
-
-
-def collision():
-    hit_list = collision_test()
-    highest = smallest = 0
-    for tile in hit_list:
-        if player.rect.right - 8 > tile.left  and player.rect.right - 8 < tile.right and player.rect.bottom >= tile.bottom:
-            player.rect.right = tile.left - 16
-            player.velocity.x = 0
-            player.position.x = player.rect.right
-        elif player.rect.left + 8 <= tile.right and player.rect.left + 8 > tile.left and player.rect.bottom >= tile.bottom:
-            player.rect.left = tile.right + 18
-            player.velocity.x = 0
-            player.position.x = player.rect.left
-        elif player.velocity.y > 0:
-            player.velocity.y = 0
-            player.rect.bottom = tile.top - 18
-            player.position.y = player.rect.bottom
-            player.jumping = False
-
-
-map_size = load_map()
-
-
 def game():
     running = True
+    all_sprites = pygame.sprite.Group()
+    platforms = pygame.sprite.Group()
+    player = Player(platforms)
+    all_sprites.add(player)
+    map_size = load_map(all_sprites, platforms)
     camera = Camera(map_size[0], map_size[1])
     while running:
-        collision()
+        collision(player, platforms)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
