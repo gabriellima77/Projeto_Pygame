@@ -18,32 +18,35 @@ font = pygame.font.Font("Anton-Regular.ttf", 30)
 background = pygame.image.load("img/background.jpg")
 
 
-def get_collision(player, tile):
+def get_collision(rect, tile):
     hit_rect_list = []
     for i in tile:
-        if player.rect.colliderect(i.rect):
+        if rect.colliderect(i.rect):
             hit_rect_list.append(i.rect)
     return hit_rect_list
 
 
-def collision(player, tiles):
-    hits = get_collision(player, tiles)
-    for hit in hits:
-        if player.rect.left < hit.right and (player.rect.left > hit.left and hit.bottom < player.rect.bottom):
-            player.rect.left = hit.right
-            player.velocity.x = 0
-            player.position.x = player.rect.left
-        elif player.rect.right > hit.left and (player.rect.right < hit.right and hit.bottom < player.rect.bottom):
-            player.rect.right = hit.left
-            player.velocity.x = 0
-            player.position.x = player.rect.right - 49
-        elif player.rect.bottom > hit.top and player.rect.bottom < hit.bottom:
-            player.rect.bottom = hit.top + 1
-            player.position.y = player.rect.top
-            player.velocity.y = 0
-            player.jumping = False
-        elif player.rect.top + 5 < hit.bottom and player.velocity.y < 0:
-            player.velocity.y = 0
+def move(rect, movement, tiles):
+    collision_type = {'Top': False, 'Right': False, 'Bottom': False, 'Left': False}
+    rect.x += movement[0]
+    hits = get_collision(rect, tiles)
+    for tile in hits:
+        if movement[0] > 0:
+            collision_type['Right'] = True
+            rect.right = tile.left
+        if movement[0] < 0:
+            collision_type['Left'] = True
+            rect.left = tile.right
+    rect.y += movement[1]
+    hits = get_collision(rect, tiles)
+    for tile in hits:
+        if movement[1] > 0:
+            collision_type['Bottom'] = True
+            rect.bottom = tile.top
+        if movement[1] < 0:
+            collision_type['Top'] = True
+            rect.top = tile.bottom
+    return rect, collision_type
 
 
 def show_text(x, y, text, text_color, text_font):
@@ -92,15 +95,41 @@ def game():
     map_size = load_map(all_sprites, platforms)
     camera = Camera(map_size[0], map_size[1])
     while running:
-        collision(player, platforms)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN:
                 if (event.key == K_w or event.key == K_UP) and not player.jumping:
-                    player.jump()
+                    player.jumping = True
+                    if player.jump_time < 6:
+                        player.momentum = -5
+                if event.key == K_RIGHT or event.key == K_d:
+                    player.move_r = True
+                if event.key == K_LEFT or event.key == K_a:
+                    player.move_l = True
+            if event.type == KEYUP:
+                if event.key == K_RIGHT or event.key == K_d:
+                    player.move_r = False
+                if event.key == K_LEFT or event.key == K_a:
+                    player.move_l = False
         all_sprites.update()
+        player.movement = [0, 0]
+        if player.move_r:
+            player.movement[0] += 4
+        if player.move_l:
+            player.movement[0] -= 4
+        player.movement[1] += player.momentum
+        player.momentum += GRAV
+        if player.momentum > 7:
+            player.momentum = 7
+        player.rect, collisions = move(player.rect, player.movement, platforms)
+        if collisions['Bottom']:
+            player.jumping = False
+            player.momentum = 0
+            player.jump_time = 0
+        else:
+            player.jump_time += 1
         camera.update(player)
         display.fill(BLACK)
         for sprite in all_sprites:

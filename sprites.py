@@ -1,22 +1,21 @@
 import pygame
 from pygame.locals import *
 from settings import *
-vect = pygame.math.Vector2
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, plat):
+    def __init__(self, move):
         pygame.sprite.Sprite.__init__(self)
-        self.plat = plat
         self.current_frame = 0
         self.last_update = 0
         self.load_images()
         self.image = self.sprite_idle[0]
         self.rect = self.image.get_rect()
-        self.velocity = vect(0, 0)
-        self.acceleration = vect(0, 0)
-        self.position = vect(0, 0)
-        self.walking = False
+        self.movement = [0, 0]
+        self.momentum = 0
+        self.move_r = False
+        self.move_l = False
+        self.jump_time = 0
         self.jumping = False
 
     def load_images(self):
@@ -42,59 +41,32 @@ class Player(pygame.sprite.Sprite):
         for s in self.sprite_jump_r:
             self.sprite_jump_l.append(pygame.transform.flip(s, True, False))
 
-    def jump(self):
-        self.velocity.y = -5
-        self.jumping = True
 
     def update(self):
         self.animate()
-        self.acceleration = vect(0, GRAV)
-        keys = pygame.key.get_pressed()
-        if keys[K_LEFT] or keys[K_a]:
-            self.acceleration.x = -PLAYER_ACC
-        if keys[K_RIGHT] or keys[K_d]:
-            self.acceleration.x = PLAYER_ACC
-        # Movement
-        self.acceleration.x += self.velocity.x * PLAYER_FRICTION
-        self.velocity += self.acceleration
-        if abs(self.velocity.x) < 0.5:
-            self.velocity.x = 0
-        self.position += self.velocity + 0.5 * self.acceleration
-        self.rect.x = self.position.x
-        self.rect.y = self.position.y
 
     def animate(self):
         now = pygame.time.get_ticks()
-        if self.velocity.x != 0:
-            self.walking = True
-        else:
-            self.walking = False
-        if self.walking:
+        if self.move_l or self.move_r:
             if now - self.last_update > 100:
                 self.last_update = now
-                bottom = self.rect.bottom
-                if self.velocity.x > 0 and not self.jumping:
+                if self.move_r and not self.jumping:
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_run_r)
                     self.image = self.sprite_run_r[self.current_frame]
-                elif self.velocity.x < 0 and not self.jumping:
+                elif self.move_l and not self.jumping:
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_run_l)
                     self.image = self.sprite_run_l[self.current_frame]
-                elif self.velocity.x > 0 and self.jumping:
+                elif self.move_r and self.jumping:
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_r)
                     self.image = self.sprite_jump_r[self.current_frame]
                 else:
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_l)
                     self.image = self.sprite_jump_l[self.current_frame]
-                self.rect = self.image.get_rect()
-                self.rect.bottom = bottom
-        if not self.jumping and not self.walking:
+        if not self.jumping and not self.move_r and not self.move_l:
             if now - self.last_update > 150:
                 self.last_update = now
-                bottom = self.rect.bottom
                 self.current_frame = (self.current_frame + 1) % len(self.sprite_idle)
                 self.image = self.sprite_idle[self.current_frame]
-                self.rect = self.image.get_rect()
-                self.rect.bottom = bottom
 
 
 class Platforms(pygame.sprite.Sprite):
