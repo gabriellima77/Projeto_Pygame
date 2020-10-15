@@ -17,11 +17,17 @@ font = pygame.font.Font("Anton-Regular.ttf", 30)
 # Background
 background = pygame.image.load("img/background.jpg")
 
+# Map's variables
+tile_map = TiledMap("map/tile_map.tmx")
+map_img = tile_map.make_map()
+map_rect = map_img.get_rect()
+
 
 def get_collision(rect, tile):
     hit_rect_list = []
     for i in tile:
         if rect.colliderect(i.rect):
+            print(1)
             hit_rect_list.append(i.rect)
     return hit_rect_list
 
@@ -50,21 +56,37 @@ def move(rect, movement, tiles):
 
 
 def show_text(x, y, text, text_color, text_font):
-    text_render = text_font.render(text, True, text_color)
-    display.blit(text_render, (x, y))
+    text_surface = text_font.render(text, True, text_color)
+    screen.blit(text_surface, (x, y))
 
 
 def main_menu():
+    color = (0, 255, 0)
+    click = False
     while True:
         screen.fill(BLACK)
-        game()
-        display.blit(background, (0, 0))
+        screen.blit(background, (0, 0))
         show_text(293, 33, 'Projeto Teste', BLACK, font)
         show_text(290, 30, 'Projeto Teste', WHITE, font)
+        mx, my = pygame.mouse.get_pos()
+        play_button = pygame.Rect(260, 250, 200, 50)
+        if play_button.collidepoint((mx, my)):
+            if click:
+                game()
+            else:
+                color = (0, 0, 255)
+        else:
+            color = (0, 255, 0)
+        pygame.draw.rect(screen, color, play_button)
+        show_text(335, 253, 'Play', BLACK, font)
+        click = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
         pygame.display.update()
         clock.tick(FPS)
 
@@ -85,15 +107,18 @@ def load_map(sprites, platform):
     file.close()
     return i*32, j*32
 
-
+player = 0
 def game():
     running = True
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
-    player = Player(platforms)
+    for tile_object in tile_map.tmxdata.objects:
+        if tile_object.name == 'player':
+            player = Player(tile_object.x, tile_object.y)
+        if tile_object.name == 'platform':
+            Platforms(platforms, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
     all_sprites.add(player)
-    map_size = load_map(all_sprites, platforms)
-    camera = Camera(map_size[0], map_size[1])
+    camera = Camera(tile_map.width, tile_map.height)
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -131,7 +156,8 @@ def game():
         else:
             player.jump_time += 1
         camera.update(player)
-        display.fill(BLACK)
+        display.fill((85, 180, 255))
+        display.blit(map_img, camera.apply_rect(map_rect))
         for sprite in all_sprites:
             display.blit(sprite.image, camera.apply(sprite))
         screen.blit(pygame.transform.scale(display, SIZE), (0, 0))
