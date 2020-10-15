@@ -27,14 +27,18 @@ def get_collision(rect, tile):
     hit_rect_list = []
     for i in tile:
         if rect.colliderect(i.rect):
-            print(1)
             hit_rect_list.append(i.rect)
     return hit_rect_list
 
 
 def move(rect, movement, tiles):
     collision_type = {'Top': False, 'Right': False, 'Bottom': False, 'Left': False}
-    rect.x += movement[0]
+    if rect.x >= 0 and rect.x < tile_map.width:
+        rect.x += movement[0]
+        if rect.x < 0:
+            rect.x = 0
+        if rect.x > tile_map.width - 32:
+            rect.x = tile_map.width - 32
     hits = get_collision(rect, tiles)
     for tile in hits:
         if movement[0] > 0:
@@ -91,23 +95,9 @@ def main_menu():
         clock.tick(FPS)
 
 
-def load_map(sprites, platform):
-    file = open("map.txt", "r")
-    m = file.read()
-    i = j = 0
-    for cell in m:
-        if cell == '\n':
-            i += 1
-            j = -1
-        if cell == '1':
-            p = Platforms(j, i)
-            sprites.add(p)
-            platform.add(p)
-        j += 1
-    file.close()
-    return i*32, j*32
-
 player = 0
+
+
 def game():
     running = True
     all_sprites = pygame.sprite.Group()
@@ -120,6 +110,8 @@ def game():
     all_sprites.add(player)
     camera = Camera(tile_map.width, tile_map.height)
     while running:
+        if not player.alive:
+            player.kill()
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()

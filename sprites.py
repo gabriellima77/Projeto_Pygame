@@ -25,6 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.move_l = False
         self.jump_time = 0
         self.jumping = False
+        self.alive = True
 
     def load_images(self):
         path = 'img/sprites/'
@@ -128,6 +129,10 @@ class Camera:
         return rect.move(self.camera.topleft)
 
     def update(self, target):
-        x = -target.rect.x + SIZEUP[0] / 2
         y = -target.rect.y + SIZEUP[1] / 2
+        if target.rect.y >= self.height - 160:
+            y = self.camera.y
+        x = -target.rect.x + SIZEUP[0] / 2
+        if target.rect.x >= self.width - 250:
+            x = self.camera.x
         self.camera = pygame.Rect(x, y, self.width, self.height)
