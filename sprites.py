@@ -29,20 +29,20 @@ class Player(pygame.sprite.Sprite):
 
     def load_images(self):
         path = 'img/sprites/'
-        self.sprite_idle = (pygame.image.load(path + "idle/adventurer-idle-00.png").convert(),
-                            pygame.image.load(path + "idle/adventurer-idle-01.png").convert(),
-                            pygame.image.load(path + "idle/adventurer-idle-02.png").convert())
-        self.sprite_run_r = (pygame.image.load(path + "run/adventurer-run-00.png").convert(),
-                             pygame.image.load(path + "run/adventurer-run-01.png").convert(),
-                             pygame.image.load(path + "run/adventurer-run-02.png").convert(),
-                             pygame.image.load(path + "run/adventurer-run-03.png").convert(),
-                             pygame.image.load(path + "run/adventurer-run-04.png").convert(),
-                             pygame.image.load(path + "run/adventurer-run-05.png").convert())
-        self.sprite_jump_r = (pygame.image.load(path + "jump/adventurer-jump-00.png").convert(),
-                              pygame.image.load(path + "jump/adventurer-jump-01.png").convert(),
-                              pygame.image.load(path + "jump/adventurer-jump-02.png").convert(),
-                              pygame.image.load(path + "jump/adventurer-jump-03.png").convert(),
-                              pygame.image.load(path + "jump/adventurer-jump-04.png").convert())
+        self.sprite_idle = (pygame.image.load(path + "idle/adventurer-idle-00.png"),
+                            pygame.image.load(path + "idle/adventurer-idle-01.png"),
+                            pygame.image.load(path + "idle/adventurer-idle-02.png"))
+        self.sprite_run_r = (pygame.image.load(path + "run/adventurer-run-00.png"),
+                             pygame.image.load(path + "run/adventurer-run-01.png"),
+                             pygame.image.load(path + "run/adventurer-run-02.png"),
+                             pygame.image.load(path + "run/adventurer-run-03.png"),
+                             pygame.image.load(path + "run/adventurer-run-04.png"),
+                             pygame.image.load(path + "run/adventurer-run-05.png"))
+        self.sprite_jump_r = (pygame.image.load(path + "jump/adventurer-jump-00.png"),
+                              pygame.image.load(path + "jump/adventurer-jump-01.png"),
+                              pygame.image.load(path + "jump/adventurer-jump-02.png"),
+                              pygame.image.load(path + "jump/adventurer-jump-03.png"),
+                              pygame.image.load(path + "jump/adventurer-jump-04.png"))
         self.sprite_run_l = []
         self.sprite_jump_l = []
         for s in self.sprite_run_r:

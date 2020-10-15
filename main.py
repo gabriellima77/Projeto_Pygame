@@ -17,10 +17,18 @@ font = pygame.font.Font("Anton-Regular.ttf", 30)
 # Background
 background = pygame.image.load("img/background.jpg")
 
+phase=1
 # Map's variables
-tile_map = TiledMap("map/tile_map.tmx")
+tile_map = TiledMap("map/tile_map"+str(phase)+".tmx")
 map_img = tile_map.make_map()
 map_rect = map_img.get_rect()
+
+
+def change_map():
+    global tile_map
+    tile_map = TiledMap("map/tile_map"+str(phase)+".tmx")
+    map_img = tile_map.make_map()
+    map_rect = map_img.get_rect()
 
 
 def get_collision(rect, tile):
@@ -67,6 +75,10 @@ def show_text(x, y, text, text_color, text_font):
 def main_menu():
     color = (0, 255, 0)
     click = False
+    player2 = Player(200, 50)
+    player2.move_r=True
+    player2.move_l=True
+        
     while True:
         screen.fill(BLACK)
         screen.blit(background, (0, 0))
@@ -74,15 +86,20 @@ def main_menu():
         show_text(290, 30, 'Projeto Teste', WHITE, font)
         mx, my = pygame.mouse.get_pos()
         play_button = pygame.Rect(260, 250, 200, 50)
+        
         if play_button.collidepoint((mx, my)):
             if click:
-                game()
+                menu()
             else:
                 color = (0, 0, 255)
         else:
             color = (0, 255, 0)
+        
+        player2.update()
         pygame.draw.rect(screen, color, play_button)
         show_text(335, 253, 'Play', BLACK, font)
+        screen.blit(pygame.transform.scale(player2.image, (32, 30)), (270,260))
+        
         click = False
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -95,11 +112,30 @@ def main_menu():
         clock.tick(FPS)
 
 
-player = 0
+def menu():
+    if phase == 1:
+        print("Phase:1")
+        game()
+    elif phase == 2:
+        print("Phase:2")
+        game()
+    elif phase == 3:
+        print("Phase:3")
+        game()
+        
+    else:
+        pygame.quit()
+        sys.exit()
 
+
+player = 0
+    
+        
 
 def game():
     running = True
+    change_map()
+    global phase
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
     for tile_object in tile_map.tmxdata.objects:
@@ -125,6 +161,19 @@ def game():
                     player.move_r = True
                 if event.key == K_LEFT or event.key == K_a:
                     player.move_l = True
+                if event.key == K_RETURN and phase==0:
+                    player.move_r = False
+                    player.move_l = False
+                    phase = 1
+                    running = False
+                elif event.key == K_RETURN and phase==1:
+                    phase = 2
+                    running = False
+                elif event.key == K_RETURN and phase==2:
+                    phase = 3
+                    running = False
+                    continue
+
             if event.type == KEYUP:
                 if event.key == K_RIGHT or event.key == K_d:
                     player.move_r = False
