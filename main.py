@@ -55,7 +55,7 @@ def move(rect, movement, tiles):
         if movement[0] < 0:
             collision_type['Left'] = True
             rect.left = tile.right
-    rect.y += movement[1]
+    rect.y += round(movement[1])
     hits = get_collision(rect, tiles)
     for tile in hits:
         if movement[1] > 0:
