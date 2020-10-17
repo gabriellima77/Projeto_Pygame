@@ -102,7 +102,7 @@ def main_menu():
         
         click = False
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -149,35 +149,35 @@ def game():
         if not player.alive:
             player.kill()
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == KEYDOWN:
-                if (event.key == K_w or event.key == K_UP) and not player.jumping:
+            if event.type == pygame.KEYDOWN:
+                if (event.key == pygame.K_w or event.key == pygame.K_UP) and not player.jumping:
                     player.jumping = True
                     if player.jump_time < 6:
                         player.momentum = -5
-                if event.key == K_RIGHT or event.key == K_d:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.move_r = True
-                if event.key == K_LEFT or event.key == K_a:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.move_l = True
-                if event.key == K_RETURN and phase==0:
+                if event.key == pygame.K_RETURN and phase==0:
                     player.move_r = False
                     player.move_l = False
                     phase = 1
                     running = False
-                elif event.key == K_RETURN and phase==1:
+                elif event.key == pygame.K_RETURN and phase==1:
                     phase = 2
                     running = False
-                elif event.key == K_RETURN and phase==2:
+                elif event.key == pygame.K_RETURN and phase==2:
                     phase = 3
                     running = False
                     continue
 
-            if event.type == KEYUP:
-                if event.key == K_RIGHT or event.key == K_d:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.move_r = False
-                if event.key == K_LEFT or event.key == K_a:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.move_l = False
         all_sprites.update()
         player.movement = [0, 0]
