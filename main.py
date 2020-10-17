@@ -13,6 +13,7 @@ display = pygame.Surface((SIZEUP[0], SIZEUP[1]))
 
 # Font
 font = pygame.font.Font("Anton-Regular.ttf", 30)
+font_button = pygame.font.Font("SansitaSwashed-VariableFont_wght.ttf", 23)
 
 # Background
 background = pygame.image.load("img/background.jpg")
@@ -22,6 +23,20 @@ phase=1
 tile_map = TiledMap("map/tile_map"+str(phase)+".tmx")
 map_img = tile_map.make_map()
 map_rect = map_img.get_rect()
+
+
+def information():
+    running = True
+    while running:
+        screen.fill(BLACK)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+        pygame.display.update()
 
 
 def change_map():
@@ -73,11 +88,13 @@ def show_text(x, y, text, text_color, text_font):
 
 
 def main_menu():
+    x = 0
+    acc = 2
     color = (0, 255, 0)
     click = False
     player2 = Player(200, 50)
-    player2.move_r=True
-    player2.move_l=True
+    button_play = Button(260, 250, 'img/UI/ui1.png')
+    button_info = Button(280, 300, 'img/UI/ui2.png')
         
     while True:
         screen.fill(BLACK)
@@ -85,21 +102,6 @@ def main_menu():
         show_text(293, 33, 'Projeto Teste', BLACK, font)
         show_text(290, 30, 'Projeto Teste', WHITE, font)
         mx, my = pygame.mouse.get_pos()
-        play_button = pygame.Rect(260, 250, 200, 50)
-        
-        if play_button.collidepoint((mx, my)):
-            if click:
-                menu()
-            else:
-                color = (0, 0, 255)
-        else:
-            color = (0, 255, 0)
-        
-        player2.update()
-        pygame.draw.rect(screen, color, play_button)
-        show_text(335, 253, 'Play', BLACK, font)
-        screen.blit(pygame.transform.scale(player2.image, (32, 30)), (270,260))
-        
         click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -108,6 +110,29 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        if button_play.circle_rect.collidepoint((mx, my)) or button_play.txt_rect.collidepoint((mx, my)):
+            if click:
+                menu()
+        if button_info.circle_rect.collidepoint((mx, my)) or button_info.txt_rect.collidepoint((mx, my)):
+            if click:
+                information()
+        screen.blit(button_play.img_circle, (button_play.circle_rect.x, button_play.circle_rect.y))
+        screen.blit(button_play.img_txt, (button_play.txt_rect.x, button_play.txt_rect.y))
+        screen.blit(button_info.img_circle, (button_info.circle_rect.x, button_info.circle_rect.y))
+        screen.blit(button_info.img_txt, (button_info.txt_rect.x, button_info.txt_rect.y))
+        player2.update()
+        show_text(button_play.txt_rect.center[0] - 10, button_play.txt_rect.center[1] - 10, 'Play', BLACK, font_button)
+        show_text(button_info.txt_rect.center[0] - 10, button_info.txt_rect.center[1] - 10, 'Info', BLACK, font_button)
+        if acc > 0:
+            player2.move_l = False
+            player2.move_r = True
+        else:
+            player2.move_r = False
+            player2.move_l = True
+        screen.blit(pygame.transform.scale(player2.image, (32, 30)), (x, 30))
+        x += acc
+        if x > SIZE[0] - 32 or x < 0:
+            acc *= -1
         pygame.display.update()
         clock.tick(FPS)
 

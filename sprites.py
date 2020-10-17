@@ -136,3 +136,18 @@ class Camera:
         if target.rect.x >= self.width - 250:
             x = self.camera.x
         self.camera = pygame.Rect(x, y, self.width, self.height)
+
+
+class Button:
+    def __init__(self, x, y, path_img):
+        self.img_circle = pygame.image.load(path_img)
+        self.img_txt = pygame.image.load('img/UI/ui4.png')
+        self.circle_rect = self.img_circle.get_rect()
+        self.img_circle = pygame.transform.scale(self.img_circle, (int(self.circle_rect.width * 1.5), int(self.circle_rect.height * 1.5)))
+        self.circle_rect = self.img_circle.get_rect()
+        self.txt_rect = self.img_txt.get_rect()
+        self.img_txt = pygame.transform.scale(self.img_txt, (int(self.txt_rect.width * 1.5), int(self.txt_rect.height * 1.5)))
+        self.circle_rect.x = x
+        self.circle_rect.y = y
+        self.txt_rect.x = self.circle_rect.x + self.circle_rect.width - 1
+        self.txt_rect.y = y + 5
