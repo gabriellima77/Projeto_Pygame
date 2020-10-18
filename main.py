@@ -7,6 +7,7 @@ from sprites import *
 pygame.init()
 clock = pygame.time.Clock()
 
+
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption(TITLE)
 display = pygame.Surface((SIZEUP[0], SIZEUP[1]))
@@ -16,7 +17,7 @@ font = pygame.font.Font("Anton-Regular.ttf", 30)
 font_button = pygame.font.Font("SansitaSwashed-VariableFont_wght.ttf", 23)
 
 # Background
-background = pygame.image.load("img/background.jpg")
+background = pygame.image.load("img/Gaeron.png")
 
 phase=1
 # Map's variables
@@ -27,8 +28,10 @@ map_rect = map_img.get_rect()
 
 def information():
     running = True
+    background = pygame.image.load("img/Help.png")
+
     while running:
-        screen.fill(BLACK)
+        screen.blit(background, (0, 0))
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -90,20 +93,21 @@ def show_text(x, y, text, text_color, text_font):
     screen.blit(text_surface, (x, y))
 
 
+
+
 def main_menu():
     x = 0
     acc = 2
     color = (0, 255, 0)
     click = False
     player2 = Player(200, 50)
-    button_play = Button(260, 250, 'img/UI/ui1.png')
-    button_info = Button(280, 300, 'img/UI/ui2.png')
-        
+    button_play = Button(260, 300, 'img/UI/ui1.png')
+    button_info = Button(280, 350, 'img/UI/ui2.png')
+    pygame.mixer.music.load('open.mp3')
+    pygame.mixer.music.play(-1)
     while True:
         screen.fill(BLACK)
         screen.blit(background, (0, 0))
-        show_text(293, 33, 'Projeto Teste', BLACK, font)
-        show_text(290, 30, 'Projeto Teste', WHITE, font)
         mx, my = pygame.mouse.get_pos()
         click = False
         for event in pygame.event.get():
@@ -115,6 +119,7 @@ def main_menu():
                     click = True
         if button_play.circle_rect.collidepoint((mx, my)) or button_play.txt_rect.collidepoint((mx, my)):
             if click:
+                pygame.mixer.music.stop()
                 menu()
         if button_info.circle_rect.collidepoint((mx, my)) or button_info.txt_rect.collidepoint((mx, my)):
             if click:
@@ -132,10 +137,15 @@ def main_menu():
         else:
             player2.move_r = False
             player2.move_l = True
-        screen.blit(pygame.transform.scale(player2.image, (32, 30)), (x, 30))
+        screen.blit(pygame.transform.scale(player2.image, (32, 30)), (x, 420))
         x += acc
         if x > SIZE[0] - 32 or x < 0:
             acc *= -1
+        if pygame.mixer.music.get_pos()==206:
+            print(pygame.mixer.music.get_pos())
+            pygame.mixer.music.load('open.mp3')
+            pygame.mixer.music.play()
+        
         pygame.display.update()
         clock.tick(FPS)
 
@@ -154,16 +164,17 @@ def menu():
     else:
         pygame.quit()
         sys.exit()
-
-
-player = 0
-    
+ 
         
-
 def game():
     running = True
     change_map()
     global phase
+    pygame.mixer.music.load('phase.mp3')
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_pos(10)#10
+    
+    
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
     for tile_object in tile_map.tmxdata.objects:
@@ -189,6 +200,8 @@ def game():
                     player.move_r = True
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.move_l = True
+                if event.key == pygame.K_ESCAPE:
+                    information()
                 if event.key == pygame.K_RETURN and phase==0:
                     player.move_r = False
                     player.move_l = False
@@ -231,6 +244,7 @@ def game():
             display.blit(sprite.image, camera.apply(sprite))
         screen.blit(pygame.transform.scale(display, SIZE), (0, 0))
         pygame.display.update()
+        
         clock.tick(FPS)
 
 
