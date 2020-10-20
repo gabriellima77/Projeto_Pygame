@@ -7,7 +7,7 @@ SIZEUP = (int(SIZE[0] // UPPERSCALE), int(SIZE[1] // UPPERSCALE))
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 FPS = 60
-TITLE = 'Platform Game'
+TITLE = 'Gaeron Adventure'
 TILE_SIZE = 32
 
 # Player Properties
