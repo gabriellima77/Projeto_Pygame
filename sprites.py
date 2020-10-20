@@ -15,7 +15,7 @@ class Player(pygame.sprite.Sprite):
         self.current_frame = 0
         self.last_update = 0
         self.load_images()
-        self.image = self.sprite_idle[0]
+        self.image = self.sprite_idle_r[0]
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -23,13 +23,15 @@ class Player(pygame.sprite.Sprite):
         self.momentum = 0
         self.move_r = False
         self.move_l = False
+        self.facing_r = True
+        self.facing_l = False
         self.jump_time = 0
         self.jumping = False
         self.alive = True
 
     def load_images(self):
         path = 'img/sprites/'
-        self.sprite_idle = (pygame.image.load(path + "idle/adventurer-idle-00.png"),
+        self.sprite_idle_r = (pygame.image.load(path + "idle/adventurer-idle-00.png"),
                             pygame.image.load(path + "idle/adventurer-idle-01.png"),
                             pygame.image.load(path + "idle/adventurer-idle-02.png"))
         self.sprite_run_r = (pygame.image.load(path + "run/adventurer-run-00.png"),
@@ -43,13 +45,17 @@ class Player(pygame.sprite.Sprite):
                               pygame.image.load(path + "jump/adventurer-jump-02.png"),
                               pygame.image.load(path + "jump/adventurer-jump-03.png"),
                               pygame.image.load(path + "jump/adventurer-jump-04.png"))
+        self.sprite_idle_l = []
         self.sprite_run_l = []
         self.sprite_jump_l = []
+        for s in self.sprite_idle_r:
+            self.sprite_idle_l.append(pygame.transform.flip(s, True, False))
         for s in self.sprite_run_r:
             self.sprite_run_l.append(pygame.transform.flip(s, True, False))
         for s in self.sprite_jump_r:
             self.sprite_jump_l.append(pygame.transform.flip(s, True, False))
-        color_key(self.sprite_idle)
+        color_key(self.sprite_idle_l)
+        color_key(self.sprite_idle_r)
         color_key(self.sprite_run_l)
         color_key(self.sprite_run_r)
         color_key(self.sprite_jump_l)
@@ -64,23 +70,35 @@ class Player(pygame.sprite.Sprite):
             if now - self.last_update > 100:
                 self.last_update = now
                 if self.move_r and not self.jumping:
+                    self.facing_l = False
+                    self.facing_r = True
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_run_r)
                     self.image = self.sprite_run_r[self.current_frame]
                 elif self.move_l and not self.jumping:
+                    self.facing_l = True
+                    self.facing_r = False
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_run_l)
                     self.image = self.sprite_run_l[self.current_frame]
                 elif self.move_r and self.jumping:
+                    self.facing_l = False
+                    self.facing_r = True
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_r)
                     self.image = self.sprite_jump_r[self.current_frame]
                 else:
+                    self.facing_l = True
+                    self.facing_r = False
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_l)
                     self.image = self.sprite_jump_l[self.current_frame]
         if not self.jumping and not self.move_r and not self.move_l:
             bottom = self.rect.bottom
             if now - self.last_update > 150:
                 self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.sprite_idle)
-                self.image = self.sprite_idle[self.current_frame]
+                if self.facing_r is True and self.facing_l is False:
+                    self.current_frame = (self.current_frame + 1) % len(self.sprite_idle_r)
+                    self.image = self.sprite_idle_r[self.current_frame]
+                else:
+                    self.current_frame = (self.current_frame + 1) % len(self.sprite_idle_l)
+                    self.image = self.sprite_idle_l[self.current_frame]
 
 
 class Platforms(pygame.sprite.Sprite):
