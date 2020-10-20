@@ -5,6 +5,7 @@ import sys
 from sprites import *
 
 pygame.init()
+pygame.mixer.init()
 clock = pygame.time.Clock()
 
 
@@ -13,13 +14,12 @@ pygame.display.set_caption(TITLE)
 display = pygame.Surface((SIZEUP[0], SIZEUP[1]))
 
 # Font
-font = pygame.font.Font("Anton-Regular.ttf", 30)
 font_button = pygame.font.Font("SansitaSwashed-VariableFont_wght.ttf", 23)
 
 # Background
 background = pygame.image.load("img/Gaeron.png")
 
-phase=1
+phase = 1
 # Map's variables
 tile_map = TiledMap("map/tile_map"+str(phase)+".tmx")
 map_img = tile_map.make_map()
@@ -91,8 +91,6 @@ def move(rect, movement, tiles):
 def show_text(x, y, text, text_color, text_font):
     text_surface = text_font.render(text, True, text_color)
     screen.blit(text_surface, (x, y))
-
-
 
 
 def main_menu():
@@ -202,19 +200,24 @@ def game():
                     player.move_l = True
                 if event.key == pygame.K_ESCAPE:
                     information()
-                if event.key == pygame.K_RETURN and phase==0:
+                if event.key == pygame.K_RETURN and phase == 0:
                     player.move_r = False
                     player.move_l = False
                     phase = 1
                     running = False
-                elif event.key == pygame.K_RETURN and phase==1:
+                elif event.key == pygame.K_RETURN and phase == 1:
                     phase = 2
                     running = False
-                elif event.key == pygame.K_RETURN and phase==2:
+                    menu()
+                elif event.key == pygame.K_RETURN and phase == 2:
                     phase = 3
                     running = False
-                    continue
-
+                    menu()
+                elif event.key == pygame.K_RETURN and phase == 3:
+                    phase = 1
+                    running = False
+                    pygame.mixer.music.load('open.mp3')
+                    pygame.mixer.music.play(-1)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.move_r = False
