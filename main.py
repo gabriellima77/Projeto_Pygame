@@ -59,9 +59,17 @@ def get_collision(rect, tile):
             hit_rect_list.append(i.rect)
     return hit_rect_list
 
+def fall(rect):
+    if(rect.y>1000):
+        if(phase==2):
+            rect.y = 771
+            rect.x = 0
 
 def move(rect, movement, tiles):
     collision_type = {'Top': False, 'Right': False, 'Bottom': False, 'Left': False}
+
+    fall(rect)
+
     if rect.x >= 0 and rect.x < tile_map.width:
         rect.x += movement[0]
         if rect.x < 0:
