@@ -62,14 +62,12 @@ def get_collision(rect, tile):
 def fall(rect):
     if(rect.y>1000):
         if(phase==2):
-            rect.y = 771
-            rect.x = 0
+            rect.x = 621
+            rect.y = 803
 
 def move(rect, movement, tiles):
     collision_type = {'Top': False, 'Right': False, 'Bottom': False, 'Left': False}
-
     fall(rect)
-
     if rect.x >= 0 and rect.x < tile_map.width:
         rect.x += movement[0]
         if rect.x < 0:
@@ -151,7 +149,7 @@ def main_menu():
             print(pygame.mixer.music.get_pos())
             pygame.mixer.music.load('open.mp3')
             pygame.mixer.music.play()
-        
+
         pygame.display.update()
         clock.tick(FPS)
 
@@ -166,12 +164,12 @@ def menu():
     elif phase == 3:
         print("Phase:3")
         game()
-        
+
     else:
         pygame.quit()
         sys.exit()
- 
-        
+
+
 def game():
     running = True
     change_map()
@@ -179,8 +177,7 @@ def game():
     pygame.mixer.music.load('phase.mp3')
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_pos(10)#10
-    
-    
+
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
     for tile_object in tile_map.tmxdata.objects:
@@ -193,6 +190,12 @@ def game():
     while running:
         if not player.alive:
             player.kill()
+
+        if player.rect.x >= 3160:
+            phase+= 1
+            running = False
+            menu()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -255,7 +258,7 @@ def game():
             display.blit(sprite.image, camera.apply(sprite))
         screen.blit(pygame.transform.scale(display, SIZE), (0, 0))
         pygame.display.update()
-        
+
         clock.tick(FPS)
 
 
