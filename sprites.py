@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 from settings import *
 import pytmx
 
@@ -27,11 +26,11 @@ class Player(pygame.sprite.Sprite):
         self.facing_l = False
         self.jump_time = 0
         self.jumping = False
-        self.alive = True
+        self.death = 0
 
     def load_images(self):
         path = 'img/sprites/'
-        self.sprite_idle_r = [pygame.image.load(path + "idle/adventurer-idle-0%s.png" % frame) for frame in range(0,3)]
+        self.sprite_idle_r = [pygame.image.load(path + "idle/adventurer-idle-0%s.png" % frame) for frame in range(0, 3)]
         self.sprite_run_r = [pygame.image.load(path + "run/adventurer-run-0%s.png" % frame) for frame in range(0, 6)]
         self.sprite_jump_r = [pygame.image.load(path + "jump/adventurer-jump-0%s.png" % frame) for frame in range(0, 5)]
         self.sprite_idle_l = []
@@ -79,7 +78,6 @@ class Player(pygame.sprite.Sprite):
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_l)
                     self.image = self.sprite_jump_l[self.current_frame]
         if not self.jumping and not self.move_r and not self.move_l:
-            bottom = self.rect.bottom
             if now - self.last_update > 150:
                 self.last_update = now
                 if self.facing_r is True and self.facing_l is False:

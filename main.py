@@ -60,19 +60,18 @@ def get_collision(rect, tile):
     return hit_rect_list
 
 
-def fall(rect):
-    if rect.y > 1000:
-        if phase == 1:
-            rect.x = 0
-            rect.y = 759
-        elif phase == 2:
-            rect.x = 621
-            rect.y = 803
+def fall(player):
+    if player.rect.y > tile_map.height:
+        for tile_object in tile_map.tmxdata.objects:
+            if tile_object.name == "player":
+                player.rect.x = int(tile_object.x)
+                player.rect.y = int(tile_object.y)
+                player.death += 1
 
 
-def move(rect, movement, tiles):
+def move(rect, movement, tiles, player):
     collision_type = {'Top': False, 'Right': False, 'Bottom': False, 'Left': False}
-    fall(rect)
+    fall(player)
     if tile_map.width > rect.x >= 0:
         rect.x += movement[0]
         if rect.x < 0:
@@ -107,7 +106,6 @@ def show_text(x, y, text, text_color, text_font):
 def main_menu():
     x = 0
     acc = 2
-    color = (0, 255, 0)
     click = False
     player2 = Player(200, 50)
     button_play = Button(260, 300, 'img/UI/ui1.png')
@@ -150,8 +148,8 @@ def main_menu():
         x += acc
         if x > SIZE[0] - 32 or x < 0:
             acc *= -1
-        if pygame.mixer.music.get_pos()==206:
-            print(pygame.mixer.music.get_pos())
+        if pygame.mixer.music.get_pos() == 206:
+            pygame.mixer.music.get_pos()
             pygame.mixer.music.load('open.mp3')
             pygame.mixer.music.play()
 
@@ -181,7 +179,7 @@ def game():
     global phase
     pygame.mixer.music.load('phase.mp3')
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_pos(10)#10
+    pygame.mixer.music.set_pos(10)  # 10
 
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
@@ -193,10 +191,7 @@ def game():
     all_sprites.add(player)
     camera = Camera(tile_map.width, tile_map.height)
     while running:
-        if not player.alive:
-            player.kill()
-
-        if player.rect.x >= 3160:
+        if player.rect.x >= tile_map.width - 32:
             phase += 1
             running = False
             menu()
@@ -249,7 +244,7 @@ def game():
         player.momentum += GRAV
         if player.momentum > 7:
             player.momentum = 7
-        player.rect, collisions = move(player.rect, player.movement, platforms)
+        player.rect, collisions = move(player.rect, player.movement, platforms, player)
         if collisions['Bottom']:
             player.jumping = False
             player.momentum = 0
@@ -262,6 +257,7 @@ def game():
         for sprite in all_sprites:
             display.blit(sprite.image, camera.apply(sprite))
         screen.blit(pygame.transform.scale(display, SIZE), (0, 0))
+        show_text(SIZE[0] - 150, 10, "Deaths: " + str(player.death), WHITE, font_button)
         pygame.display.update()
 
         clock.tick(FPS)
