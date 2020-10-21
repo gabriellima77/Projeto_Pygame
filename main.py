@@ -174,13 +174,13 @@ def menu():
 
 
 def game():
+    player = end = 0
     running = True
     change_map()
     global phase
     pygame.mixer.music.load('phase.mp3')
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_pos(10)  # 10
-
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
     for tile_object in tile_map.tmxdata.objects:
@@ -188,10 +188,15 @@ def game():
             player = Player(tile_object.x, tile_object.y)
         if tile_object.name == 'platform':
             Platforms(platforms, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+        if tile_object.name == 'end':
+            end = pygame.Rect(int(tile_object.x), int(tile_object.y), int(tile_object.width), int(tile_object.height))
+        else:
+            end = pygame.Rect(3168, 867, 32, 32)
     all_sprites.add(player)
     camera = Camera(tile_map.width, tile_map.height)
     while running:
-        if player.rect.x >= tile_map.width - 32:
+        print(player.rect.x, player.rect.y)
+        if player.rect.colliderect(end):
             phase += 1
             running = False
             menu()
