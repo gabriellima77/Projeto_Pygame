@@ -64,7 +64,7 @@ def change_map():
 
 def show_text(x, y, text, text_color, text_font):
     text_surface = text_font.render(text, True, text_color)
-    screen.blit(text_surface, (x, y))
+    screen.blit(text_surface, (int(x), int(y)))
 
 
 def main_menu():
