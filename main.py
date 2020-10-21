@@ -136,8 +136,8 @@ def main_menu():
         screen.blit(button_info.img_circle, (button_info.circle_rect.x, button_info.circle_rect.y))
         screen.blit(button_info.img_txt, (button_info.txt_rect.x, button_info.txt_rect.y))
         player2.update()
-        show_text(button_play.txt_rect.center[0] - 10, button_play.txt_rect.center[1] - 10, 'Play', BLACK, font_button)
-        show_text(button_info.txt_rect.center[0] - 10, button_info.txt_rect.center[1] - 10, 'Info', BLACK, font_button)
+        show_text(button_play.txt_rect.center[0] - 28, button_play.txt_rect.center[1] - 16, 'Play', BLACK, font_button)
+        show_text(button_info.txt_rect.center[0] - 28, button_info.txt_rect.center[1] - 16, 'Info', BLACK, font_button)
         if acc > 0:
             player2.move_l = False
             player2.move_r = True
@@ -195,7 +195,6 @@ def game():
     all_sprites.add(player)
     camera = Camera(tile_map.width, tile_map.height)
     while running:
-        print(player.rect.x, player.rect.y)
         if player.rect.colliderect(end):
             phase += 1
             running = False

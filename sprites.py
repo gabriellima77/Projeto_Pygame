@@ -152,6 +152,7 @@ class Button:
         self.circle_rect = self.img_circle.get_rect()
         self.txt_rect = self.img_txt.get_rect()
         self.img_txt = pygame.transform.scale(self.img_txt, (int(self.txt_rect.width * 1.5), int(self.txt_rect.height * 1.5)))
+        self.txt_rect = self.img_txt.get_rect()
         self.circle_rect.x = x
         self.circle_rect.y = y
         self.txt_rect.x = self.circle_rect.x + self.circle_rect.width - 1
