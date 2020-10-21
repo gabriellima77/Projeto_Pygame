@@ -1,30 +1,12 @@
-from settings import *
 import pygame
 from pygame.locals import *
 import sys
 from sprites import *
 
 pygame.init()
-pygame.mixer.init()
-clock = pygame.time.Clock()
 
-
-screen = pygame.display.set_mode(SIZE)
-pygame.display.set_caption(TITLE)
-display = pygame.Surface((SIZEUP[0], SIZEUP[1]))
-
-# Font
-font_button = pygame.font.Font("SansitaSwashed-VariableFont_wght.ttf", 23)
-
-# Background
-background = pygame.image.load("img/Gaeron.png")
-
-phase = 1
-# Map's variables
-tile_map = TiledMap("map/tile_map"+str(phase)+".tmx")
-map_img = tile_map.make_map()
-map_rect = map_img.get_rect()
-
+from pygame_settings import *
+from player_actions import *
 
 def information():
     running = True
@@ -42,6 +24,34 @@ def information():
         pygame.display.update()
 
 
+def winner():
+    screen.fill(BLACK)
+    show_text(SIZE[0]/2, SIZE[1]/2, "YOU WIN" , WHITE, font_generics)
+    pygame.display.update()
+    pygame.mixer.music.load('sound/end.mp3')
+    pygame.mixer.music.play(-1)
+    running =True
+    global phase 
+    phase = 1
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN or event.key == pygame.K:
+                    running = False
+                    pygame.mixer.music.load('sound/open.mp3')
+                    pygame.mixer.music.play(-1)
+                    main_menu()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    running = False
+                    pygame.mixer.music.load('sound/open.mp3')
+                    pygame.mixer.music.play(-1)
+                    main_menu()
+
+
 def change_map():
     global tile_map
     global map_rect
@@ -50,52 +60,6 @@ def change_map():
     tile_map = TiledMap("map/tile_map"+str(phase)+".tmx")
     map_img = tile_map.make_map()
     map_rect = map_img.get_rect()
-
-
-def get_collision(rect, tile):
-    hit_rect_list = []
-    for i in tile:
-        if rect.colliderect(i.rect):
-            hit_rect_list.append(i.rect)
-    return hit_rect_list
-
-
-def fall(player):
-    if player.rect.y > tile_map.height:
-        for tile_object in tile_map.tmxdata.objects:
-            if tile_object.name == "player":
-                player.rect.x = int(tile_object.x)
-                player.rect.y = int(tile_object.y)
-                player.death += 1
-
-
-def move(rect, movement, tiles, player):
-    collision_type = {'Top': False, 'Right': False, 'Bottom': False, 'Left': False}
-    fall(player)
-    if tile_map.width > rect.x >= 0:
-        rect.x += movement[0]
-        if rect.x < 0:
-            rect.x = 0
-        if rect.x > tile_map.width - 32:
-            rect.x = tile_map.width - 32
-    hits = get_collision(rect, tiles)
-    for tile in hits:
-        if movement[0] > 0:
-            collision_type['Right'] = True
-            rect.right = tile.left
-        if movement[0] < 0:
-            collision_type['Left'] = True
-            rect.left = tile.right
-    rect.y += round(movement[1])
-    hits = get_collision(rect, tiles)
-    for tile in hits:
-        if movement[1] > 0:
-            collision_type['Bottom'] = True
-            rect.bottom = tile.top
-        if movement[1] < 0:
-            collision_type['Top'] = True
-            rect.top = tile.bottom
-    return rect, collision_type
 
 
 def show_text(x, y, text, text_color, text_font):
@@ -110,7 +74,7 @@ def main_menu():
     player2 = Player(200, 50)
     button_play = Button(260, 300, 'img/UI/ui1.png')
     button_info = Button(280, 350, 'img/UI/ui2.png')
-    pygame.mixer.music.load('open.mp3')
+    pygame.mixer.music.load('sound/open.mp3')
     pygame.mixer.music.play(-1)
     while True:
         screen.fill(BLACK)
@@ -150,7 +114,7 @@ def main_menu():
             acc *= -1
         if pygame.mixer.music.get_pos() == 206:
             pygame.mixer.music.get_pos()
-            pygame.mixer.music.load('open.mp3')
+            pygame.mixer.music.load('sound/open.mp3')
             pygame.mixer.music.play()
 
         pygame.display.update()
@@ -167,7 +131,8 @@ def menu():
     elif phase == 3:
         print("Phase:3")
         game()
-
+    elif phase == 4:
+        winner()    
     else:
         pygame.quit()
         sys.exit()
@@ -177,8 +142,8 @@ def game():
     player = end = 0
     running = True
     change_map()
-    global phase
-    pygame.mixer.music.load('phase.mp3')
+    global phase, death
+    pygame.mixer.music.load('sound/phase.mp3')
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_pos(10)  # 10
     all_sprites = pygame.sprite.Group()
@@ -197,6 +162,7 @@ def game():
     while running:
         if player.rect.colliderect(end):
             phase += 1
+            death += player.death
             running = False
             menu()
 
@@ -229,10 +195,7 @@ def game():
                     running = False
                     menu()
                 elif event.key == pygame.K_RETURN and phase == 3:
-                    phase = 1
-                    running = False
-                    pygame.mixer.music.load('open.mp3')
-                    pygame.mixer.music.play(-1)
+                    winner()
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.move_r = False
@@ -248,7 +211,7 @@ def game():
         player.momentum += GRAV
         if player.momentum > 7:
             player.momentum = 7
-        player.rect, collisions = move(player.rect, player.movement, platforms, player)
+        player.rect, collisions = move(player.rect, player.movement, platforms, player, tile_map)
         if collisions['Bottom']:
             player.jumping = False
             player.momentum = 0
@@ -261,7 +224,7 @@ def game():
         for sprite in all_sprites:
             display.blit(sprite.image, camera.apply(sprite))
         screen.blit(pygame.transform.scale(display, SIZE), (0, 0))
-        show_text(SIZE[0] - 150, 10, "Deaths: " + str(player.death), WHITE, font_button)
+        show_text(SIZE[0] - 150, 10, "Deaths: " + str(death+player.death), WHITE, font_generics)
         pygame.display.update()
 
         clock.tick(FPS)
