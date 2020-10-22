@@ -41,5 +41,6 @@ def move(rect, movement, tiles, player, tile_map):
         if movement[1] < 0:
             collision_type['Top'] = True
             rect.top = tile.bottom
+            player.momentum = 0.2
     return rect, collision_type
 
