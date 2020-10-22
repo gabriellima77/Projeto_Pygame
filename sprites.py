@@ -92,7 +92,7 @@ class Platforms(pygame.sprite.Sprite):
     def __init__(self, group, x, y, w, h):
         self.group = group
         pygame.sprite.Sprite.__init__(self, self.group)
-        self.rect = pygame.Rect(x, y, w, h)
+        self.rect = pygame.Rect(x, y, w, h, color=WHITE)
         self.x = x
         self.y = y
         self.rect.x = x

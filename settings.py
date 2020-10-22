@@ -15,3 +15,10 @@ PLAYER_ACC = 4
 
 
 GRAV = 0.2
+
+'''
+1 = Bush (mato)
+2 to 24 = ground (2 a 24s verificados)
+81 = vazio
+78 and 79 = water
+'''

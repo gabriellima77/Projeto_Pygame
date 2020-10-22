@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import sys
 from sprites import *
-
+import random
 pygame.init()
 
 from pygame_settings import *
@@ -39,7 +39,7 @@ def winner():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN or event.key == pygame.K:
+                if event.key == pygame.K_RETURN:
                     running = False
                     pygame.mixer.music.load('sound/open.mp3')
                     pygame.mixer.music.play(-1)
@@ -68,7 +68,7 @@ def show_text(x, y, text, text_color, text_font):
 
 
 def main_menu():
-    x = 0
+    x = 42
     acc = 2
     click = False
     player2 = Player(200, 50)
@@ -110,8 +110,9 @@ def main_menu():
             player2.move_l = True
         screen.blit(pygame.transform.scale(player2.image, (32, 30)), (x, 420))
         x += acc
-        if x > SIZE[0] - 32 or x < 0:
+        if x > SIZE[0] - 40 or x < 40:
             acc *= -1
+             
         if pygame.mixer.music.get_pos() == 206:
             pygame.mixer.music.get_pos()
             pygame.mixer.music.load('sound/open.mp3')
