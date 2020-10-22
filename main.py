@@ -188,14 +188,17 @@ def game():
                     phase = 1
                     running = False
                 elif event.key == pygame.K_RETURN and phase == 1:
+                    death += player.death
                     phase = 2
                     running = False
                     menu()
                 elif event.key == pygame.K_RETURN and phase == 2:
+                    death += player.death
                     phase = 3
                     running = False
                     menu()
                 elif event.key == pygame.K_RETURN and phase == 3:
+                    death += player.death
                     winner()
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
