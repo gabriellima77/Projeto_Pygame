@@ -26,6 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.facing_l = False
         self.jump_time = 0
         self.jumping = False
+        self.falling = False
         self.death = 0
 
     def load_images(self):
@@ -57,12 +58,12 @@ class Player(pygame.sprite.Sprite):
         if self.move_l or self.move_r:
             if now - self.last_update > 100:
                 self.last_update = now
-                if self.move_r and not self.jumping:
+                if self.move_r and not self.jumping and not self.falling:
                     self.facing_l = False
                     self.facing_r = True
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_run_r)
                     self.image = self.sprite_run_r[self.current_frame]
-                elif self.move_l and not self.jumping:
+                elif self.move_l and not self.jumping and not self.falling:
                     self.facing_l = True
                     self.facing_r = False
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_run_l)
@@ -70,22 +71,50 @@ class Player(pygame.sprite.Sprite):
                 elif self.move_r and self.jumping:
                     self.facing_l = False
                     self.facing_r = True
-                    self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_r)
+                    if self.current_frame < 3:
+                        self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_r)
                     self.image = self.sprite_jump_r[self.current_frame]
-                else:
+                elif self.move_l and self.jumping:
                     self.facing_l = True
                     self.facing_r = False
-                    self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_l)
+                    if self.current_frame < 3:
+                        self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_l)
+                    self.image = self.sprite_jump_l[self.current_frame]
+                elif self.move_r and self.falling:
+                    self.facing_l = False
+                    self.facing_r = True
+                    self.image = self.sprite_jump_r[3]
+                elif self.move_l and self.falling:
+                    self.facing_l = True
+                    self.facing_r = False
+                    self.image = self.sprite_jump_l[3]
+        if self.jumping and not self.move_r and not self.move_l:
+            if now - self.last_update > 100:
+                self.last_update = now
+                if self.facing_r and not self.facing_l:
+                    if self.current_frame < 3:
+                        self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_r)
+                    self.image = self.sprite_jump_r[self.current_frame]
+                else:
+                    if self.current_frame < 3:
+                        self.current_frame = (self.current_frame + 1) % len(self.sprite_jump_l)
                     self.image = self.sprite_jump_l[self.current_frame]
         if not self.jumping and not self.move_r and not self.move_l:
             if now - self.last_update > 150:
                 self.last_update = now
-                if self.facing_r is True and self.facing_l is False:
+                if self.facing_r and not self.facing_l:
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_idle_r)
                     self.image = self.sprite_idle_r[self.current_frame]
                 else:
                     self.current_frame = (self.current_frame + 1) % len(self.sprite_idle_l)
                     self.image = self.sprite_idle_l[self.current_frame]
+        if self.falling:
+            if now - self.last_update > 100:
+                self.last_update = now
+                if self.facing_r and not self.facing_l:
+                    self.image = self.sprite_jump_r[3]
+                else:
+                    self.image = self.sprite_jump_l[3]
 
 
 class Platforms(pygame.sprite.Sprite):

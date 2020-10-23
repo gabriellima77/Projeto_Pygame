@@ -8,6 +8,7 @@ pygame.init()
 from pygame_settings import *
 from player_actions import *
 
+
 def information():
     running = True
     background = pygame.image.load("img/Help.png")
@@ -30,9 +31,10 @@ def winner():
     pygame.display.update()
     pygame.mixer.music.load('sound/end.mp3')
     pygame.mixer.music.play(-1)
-    running =True
-    global phase 
+    running = True
+    global phase, death
     phase = 1
+    death = 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -70,7 +72,6 @@ def show_text(x, y, text, text_color, text_font):
 def main_menu():
     x = 42
     acc = 2
-    click = False
     player2 = Player(200, 50)
     button_play = Button(260, 300, 'img/UI/ui1.png')
     button_info = Button(280, 350, 'img/UI/ui2.png')
@@ -174,6 +175,7 @@ def game():
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_w or event.key == pygame.K_UP) and not player.jumping:
                     player.jumping = True
+                    player.current_frame = 0
                     if player.jump_time < 6:
                         player.momentum = -5
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
@@ -182,24 +184,13 @@ def game():
                     player.move_l = True
                 if event.key == pygame.K_ESCAPE:
                     information()
-                if event.key == pygame.K_RETURN and phase == 0:
+                if event.key == pygame.K_RETURN:
                     player.move_r = False
                     player.move_l = False
-                    phase = 1
                     running = False
-                elif event.key == pygame.K_RETURN and phase == 1:
                     death += player.death
-                    phase = 2
-                    running = False
+                    phase += 1
                     menu()
-                elif event.key == pygame.K_RETURN and phase == 2:
-                    death += player.death
-                    phase = 3
-                    running = False
-                    menu()
-                elif event.key == pygame.K_RETURN and phase == 3:
-                    death += player.death
-                    winner()
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.move_r = False
@@ -218,10 +209,13 @@ def game():
         player.rect, collisions = move(player.rect, player.movement, platforms, player, tile_map)
         if collisions['Bottom']:
             player.jumping = False
+            player.falling = False
             player.momentum = 0
             player.jump_time = 0
         else:
             player.jump_time += 1
+        if player.momentum > 1 and not player.jumping:
+            player.falling = True
         camera.update(player)
         display.fill((85, 180, 255))
         display.blit(map_img, camera.apply_rect(map_rect))

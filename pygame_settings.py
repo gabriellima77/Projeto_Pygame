@@ -17,7 +17,7 @@ font_generics = pygame.font.Font("Monotype_Gerhilt.ttf", 23)
 background = pygame.image.load("img/Gaeron.png")
 
 phase = 1
-death =0
+death = 0
 # Map's variables
 tile_map = TiledMap("map/tile_map"+str(phase)+".tmx")
 map_img = tile_map.make_map()

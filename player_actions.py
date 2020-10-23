@@ -17,7 +17,7 @@ def fall(player,tile_map):
 
 def move(rect, movement, tiles, player, tile_map):
     collision_type = {'Top': False, 'Right': False, 'Bottom': False, 'Left': False}
-    fall(player,tile_map)
+    fall(player, tile_map)
     if tile_map.width > rect.x >= 0:
         rect.x += movement[0]
         if rect.x < 0:
