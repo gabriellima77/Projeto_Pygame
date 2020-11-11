@@ -6,7 +6,7 @@ def get_collision(rect, tile):
     return hit_rect_list
 
 
-def fall(player,tile_map):
+def fall(player, tile_map):
     if player.rect.y > tile_map.height:
         for tile_object in tile_map.tmxdata.objects:
             if tile_object.name == "player":
