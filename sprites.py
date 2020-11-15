@@ -1,6 +1,8 @@
 import pygame
 from settings import *
 import pytmx
+from py_speak import speak_text
+import sys
 
 
 def color_key(sprite):
@@ -30,25 +32,39 @@ class Player(pygame.sprite.Sprite):
         self.death = 0
 
     def load_images(self):
-        path = 'img/sprites/'
-        self.sprite_idle_r = [pygame.image.load(path + "idle/adventurer-idle-0%s.png" % frame) for frame in range(0, 3)]
-        self.sprite_run_r = [pygame.image.load(path + "run/adventurer-run-0%s.png" % frame) for frame in range(0, 6)]
-        self.sprite_jump_r = [pygame.image.load(path + "jump/adventurer-jump-0%s.png" % frame) for frame in range(0, 5)]
-        self.sprite_idle_l = []
-        self.sprite_run_l = []
-        self.sprite_jump_l = []
-        for s in self.sprite_idle_r:
-            self.sprite_idle_l.append(pygame.transform.flip(s, True, False))
-        for s in self.sprite_run_r:
-            self.sprite_run_l.append(pygame.transform.flip(s, True, False))
-        for s in self.sprite_jump_r:
-            self.sprite_jump_l.append(pygame.transform.flip(s, True, False))
-        color_key(self.sprite_idle_l)
-        color_key(self.sprite_idle_r)
-        color_key(self.sprite_run_l)
-        color_key(self.sprite_run_r)
-        color_key(self.sprite_jump_l)
-        color_key(self.sprite_jump_r)
+        try:
+            path = 'assets/img/sprites/'
+            self.sprite_idle_r = [pygame.image.load(path + "idle/adventurer-idle-0%s.png" % frame) for frame in range(0, 3)]
+            self.sprite_run_r = [pygame.image.load(path + "run/adventurer-run-0%s.png" % frame) for frame in range(0, 6)]
+            self.sprite_jump_r = [pygame.image.load(path + "jump/adventurer-jump-0%s.png" % frame) for frame in range(0, 5)]
+            self.sprite_idle_l = []
+            self.sprite_run_l = []
+            self.sprite_jump_l = []
+            for s in self.sprite_idle_r:
+                self.sprite_idle_l.append(pygame.transform.flip(s, True, False))
+            for s in self.sprite_run_r:
+                self.sprite_run_l.append(pygame.transform.flip(s, True, False))
+            for s in self.sprite_jump_r:
+                self.sprite_jump_l.append(pygame.transform.flip(s, True, False))
+            color_key(self.sprite_idle_l)
+            color_key(self.sprite_idle_r)
+            color_key(self.sprite_run_l)
+            color_key(self.sprite_run_r)
+            color_key(self.sprite_jump_l)
+            color_key(self.sprite_jump_r)
+        except pygame.error as err:
+            pygame.mixer.music.pause()
+            speak_text("Um erro no pai game aconteceu.")
+            print(err)
+            pygame.quit()
+            sys.exit()
+
+        except FileNotFoundError as err:
+            pygame.mixer.music.pause()
+            speak_text("Um erro aconteceu. Um diretorio não foi encontrado ")
+            print(err)
+            pygame.quit()
+            sys.exit()
 
     def update(self):
         self.animate()
@@ -174,15 +190,30 @@ class Camera:
 
 class Button:
     def __init__(self, x, y, path_img):
-        self.img_circle = pygame.image.load(path_img)
-        self.img_txt = pygame.image.load('img/UI/ui4.png')
-        self.circle_rect = self.img_circle.get_rect()
-        self.img_circle = pygame.transform.scale(self.img_circle, (int(self.circle_rect.width * 1.5), int(self.circle_rect.height * 1.5)))
-        self.circle_rect = self.img_circle.get_rect()
-        self.txt_rect = self.img_txt.get_rect()
-        self.img_txt = pygame.transform.scale(self.img_txt, (int(self.txt_rect.width * 1.5), int(self.txt_rect.height * 1.5)))
-        self.txt_rect = self.img_txt.get_rect()
-        self.circle_rect.x = x
-        self.circle_rect.y = y
-        self.txt_rect.x = self.circle_rect.x + self.circle_rect.width - 1
-        self.txt_rect.y = y + 5
+        try:
+            self.img_circle = pygame.image.load(path_img)
+            self.img_txt = pygame.image.load('assets/img/UI/ui4.png')
+            self.circle_rect = self.img_circle.get_rect()
+            self.img_circle = pygame.transform.scale(self.img_circle, (int(self.circle_rect.width * 1.5), int(self.circle_rect.height * 1.5)))
+            self.circle_rect = self.img_circle.get_rect()
+            self.txt_rect = self.img_txt.get_rect()
+            self.img_txt = pygame.transform.scale(self.img_txt, (int(self.txt_rect.width * 1.5), int(self.txt_rect.height * 1.5)))
+            self.txt_rect = self.img_txt.get_rect()
+            self.circle_rect.x = x
+            self.circle_rect.y = y
+            self.txt_rect.x = self.circle_rect.x + self.circle_rect.width - 1
+            self.txt_rect.y = y + 5
+
+        except pygame.error as err:
+            pygame.mixer.music.pause()
+            speak_text("Um erro no pai game aconteceu.")
+            print(err)
+            pygame.quit()
+            sys.exit()
+
+        except FileNotFoundError as err:
+            pygame.mixer.music.pause()
+            speak_text("Um erro aconteceu. O diretorio img ui não foi encontrado.")
+            print(err)
+            pygame.quit()
+            sys.exit()

@@ -7,7 +7,6 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 FPS = 60
 TITLE = 'Gaeron Adventure'
-
 GRAV = 0.2
 
 '''
