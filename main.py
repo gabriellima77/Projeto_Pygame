@@ -1,4 +1,5 @@
 from sprites import *
+import sys
 pygame.init()
 from screens import *
 from py_speak import speak_text
@@ -37,8 +38,10 @@ def main_menu():
             screen.blit(button_info.img_circle, (button_info.circle_rect.x, button_info.circle_rect.y))
             screen.blit(button_info.img_txt, (button_info.txt_rect.x, button_info.txt_rect.y))
             player2.update()
-            show_text(button_play.txt_rect.center[0] - 28, button_play.txt_rect.center[1] - 16, 'Play', BLACK, font_button)
-            show_text(button_info.txt_rect.center[0] - 28, button_info.txt_rect.center[1] - 16, 'Info', BLACK, font_button)
+            show_text(button_play.txt_rect.center[0] - 28, button_play.txt_rect.center[1] - 16, 'Play', BLACK,
+                      font_button)
+            show_text(button_info.txt_rect.center[0] - 28, button_info.txt_rect.center[1] - 16, 'Info', BLACK,
+                      font_button)
             if acc > 0:
                 player2.move_l = False
                 player2.move_r = True
@@ -57,7 +60,6 @@ def main_menu():
 
             pygame.display.update()
             clock.tick(FPS)
-
     except pygame.error as err:
         pygame.mixer.music.pause()
         speak_text("Um erro no pai game aconteceu.")
