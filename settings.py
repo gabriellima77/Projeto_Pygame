@@ -1,5 +1,6 @@
 # Settings for a platform game
 # Game Properties
+import pygame
 SIZE = (720, 480)
 UPPERSCALE = 1.5
 SIZEUP = (int(SIZE[0] // UPPERSCALE), int(SIZE[1] // UPPERSCALE))

@@ -1,5 +1,6 @@
 from player_actions import move
 from screens.screens_settings import *
+from eventsKey import *
 from exceptions import *
 
 
@@ -51,33 +52,6 @@ def winner():
     except FileNotFoundError as err:
         filenotfound_error(err)
 
-
-def eventChange(event,player):
-    if event.type == pygame.KEYDOWN:
-        if (event.key == pygame.K_w or event.key == pygame.K_UP) and not player.jumping:
-            player.jumping = True
-            player.current_frame = 0
-            if player.jump_time < 6:
-                player.momentum = -5
-
-        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            player.move_r = True
-        if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            player.move_l = True
-    else:
-        if eventkeyUp(event) == 1:
-            player.move_r = False
-        elif eventkeyUp(event) == -1:
-            player.move_l = False
-
-def eventkeyUp(event):
-    if event.type == pygame.KEYUP:
-        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            return 1
-        if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            return -1
-    else:
-        return 0
 
 def game():
     try:
