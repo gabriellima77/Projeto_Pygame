@@ -1,8 +1,6 @@
-import pygame
 from settings import *
 import pytmx
-from py_speak import speak_text
-import sys
+from exceptions import *
 
 
 def color_key(sprite):
@@ -53,18 +51,10 @@ class Player(pygame.sprite.Sprite):
             color_key(self.sprite_jump_l)
             color_key(self.sprite_jump_r)
         except pygame.error as err:
-            pygame.mixer.music.pause()
-            speak_text("Um erro no pai game aconteceu.")
-            print(err)
-            pygame.quit()
-            sys.exit()
+            pygame_error(err)
 
         except FileNotFoundError as err:
-            pygame.mixer.music.pause()
-            speak_text("Um erro aconteceu. Um diretorio não foi encontrado ")
-            print(err)
-            pygame.quit()
-            sys.exit()
+            filenotfound_error(err)
 
     def update(self):
         self.animate()
@@ -205,15 +195,7 @@ class Button:
             self.txt_rect.y = y + 5
 
         except pygame.error as err:
-            pygame.mixer.music.pause()
-            speak_text("Um erro no pai game aconteceu.")
-            print(err)
-            pygame.quit()
-            sys.exit()
+            pygame_error(err)
 
         except FileNotFoundError as err:
-            pygame.mixer.music.pause()
-            speak_text("Um erro aconteceu. O diretorio img ui não foi encontrado.")
-            print(err)
-            pygame.quit()
-            sys.exit()
+            filenotfound_error(err)

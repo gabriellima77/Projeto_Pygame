@@ -1,5 +1,6 @@
+from player_actions import move
 from screens.screens_settings import *
-from py_speak import speak_text
+from exceptions import *
 
 
 def information():
@@ -45,18 +46,10 @@ def winner():
                         pygame.mixer.music.load('assets/sound/open.mp3')
                         pygame.mixer.music.play(-1)
     except pygame.error as err:
-        pygame.mixer.music.pause()
-        speak_text("Um erro no pai game aconteceu.")
-        print(err)
-        pygame.quit()
-        sys.exit()
+        pygame_error(err)
 
     except FileNotFoundError as err:
-        pygame.mixer.music.pause()
-        speak_text("Um erro aconteceu. Um diretorio não foi encontrado ")
-        print(err)
-        pygame.quit()
-        sys.exit()
+        filenotfound_error(err)
 
 
 def eventChange(event,player):
@@ -162,18 +155,10 @@ def game():
 
             clock.tick(FPS)
     except pygame.error as err:
-        pygame.mixer.music.pause()
-        speak_text("Um erro no pai game aconteceu.")
-        print(err)
-        pygame.quit()
-        sys.exit()
+        pygame_error(err)
 
     except FileNotFoundError as err:
-        pygame.mixer.music.pause()
-        speak_text("Um erro aconteceu. Um diretorio não foi encontrado ")
-        print(err)
-        pygame.quit()
-        sys.exit()
+        filenotfound_error(err)
 
 
 def menu():
@@ -202,10 +187,7 @@ def change_map():
         map_img = tile_map.make_map()
         map_rect = map_img.get_rect()
     except FileNotFoundError as err:
-        speak_text("Um erro aconteceu. O diretorio Map tile_map não foi encontrado")
-        print(err)
-        pygame.quit()
-        sys.exit()
+        filenotfound_error(err)
 
 
 def show_text(x, y, text, text_color, text_font):

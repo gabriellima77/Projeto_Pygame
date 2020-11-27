@@ -1,8 +1,7 @@
 from sprites import *
-import sys
 pygame.init()
 from screens import *
-from py_speak import speak_text
+from exceptions import *
 
 
 def main_menu():
@@ -61,18 +60,10 @@ def main_menu():
             pygame.display.update()
             clock.tick(FPS)
     except pygame.error as err:
-        pygame.mixer.music.pause()
-        speak_text("Um erro no pai game aconteceu.")
-        print(err)
-        pygame.quit()
-        sys.exit()
+        pygame_error(err)
 
     except FileNotFoundError as err:
-        pygame.mixer.music.pause()
-        speak_text("Um erro aconteceu. Um diretorio não foi encontrado ")
-        print(err)
-        pygame.quit()
-        sys.exit()
+        filenotfound_error(err)
 
 
 main_menu()

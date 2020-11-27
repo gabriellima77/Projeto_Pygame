@@ -1,9 +1,5 @@
-import sys
-from settings import *
 from sprites import *
-from player_actions import move
-from py_speak import speak_text
-from sprites import *
+from exceptions import *
 
 
 try:
@@ -30,15 +26,8 @@ try:
     map_rect = map_img.get_rect()
 
 except pygame.error as err:
-    pygame.mixer.music.pause()
-    speak_text("Um erro no pai game aconteceu.")
-    print(err)
-    pygame.quit()
-    sys.exit()
+    pygame_error(err)
 
 except FileNotFoundError as err:
-    pygame.mixer.music.pause()
-    speak_text("Um erro aconteceu. Um diretorio não foi encontrado ")
-    print(err)
-    pygame.quit()
-    sys.exit()
+    filenotfound_error(err)
+
