@@ -16,7 +16,7 @@ def eventChange(event, player):
     else:
         if eventkeyUp(event) == 1:
             player.move_r = False
-        elif eventkeyUp(event.type, event.key or False) == -1:
+        elif eventkeyUp(event) == -1:
             player.move_l = False
 
 
