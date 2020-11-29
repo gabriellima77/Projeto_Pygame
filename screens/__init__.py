@@ -108,7 +108,7 @@ def game():
             player.momentum += GRAV
             if player.momentum > 7:
                 player.momentum = 7
-            player.rect, collisions = move(player.rect, player.movement, platforms, player, tile_map)
+            player.rect, collisions = move(player, platforms, tile_map)
             if collisions['Bottom']:
                 player.jumping = False
                 player.falling = False
