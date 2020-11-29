@@ -109,6 +109,6 @@ def test_obviusError_3():
     assert eventkeyUp(p) == 0
 
 
-def test_obviusError_3():
+def test_obviusError_4():
     p.set(True, 276)
     assert eventkeyUp(p) == 0
