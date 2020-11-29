@@ -66,13 +66,13 @@ def test_no_collision():
 def test_collision_right():
     p.move(0, 0, 5, False, False)
     tile[0].change_place(0, 0)
-    assert move(p, tile, tile_map)["Right"] == True
+    assert move(p, tile, tile_map)["Right"] is True
 
 
 def test_collision_left():
     p.move(4, 0, -5, False, False)
     tile[0].change_place(0, 0)
-    assert move(p, tile, tile_map)["Left"] == True
+    assert move(p, tile, tile_map)["Left"] is True
 
 
 def test_collision_top():
