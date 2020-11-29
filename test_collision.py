@@ -39,8 +39,21 @@ tile_map = MapTest()
 tile = [Tile(), Tile()]
 
 
+# No movement
+def test_no_movement_collision():
+    count = 0
+    collision = move(p, tile, tile_map)
+    for key in collision:
+        if collision[key]:
+            count += 1
+    assert count == 0
+
+
 # No collision
 def test_no_collision():
+    p.move(0, 0, 5, True, False)
+    tile[0].change_place(50, 50)
+    tile[1].change_place(60, 60)
     count = 0
     collision = move(p, tile, tile_map)
     for key in collision:
@@ -52,12 +65,14 @@ def test_no_collision():
 # Collision with just one tile
 def test_collision_right():
     p.move(0, 0, 5, False, False)
-    assert move(p, tile, tile_map)["Right"] is True
+    tile[0].change_place(0, 0)
+    assert move(p, tile, tile_map)["Right"] == True
 
 
 def test_collision_left():
     p.move(4, 0, -5, False, False)
-    assert move(p, tile, tile_map)["Left"] is True
+    tile[0].change_place(0, 0)
+    assert move(p, tile, tile_map)["Left"] == True
 
 
 def test_collision_top():
